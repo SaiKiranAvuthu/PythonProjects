@@ -11,6 +11,9 @@ import numpy as np
 
 class Snail:
     ## Do all the initialization and making the inserting the main cell into the cells
+
+    Change=True
+
     def __init__(self,size,main):
         self.size=size
         self.MAIN_CELL=main
@@ -51,6 +54,7 @@ class Snail:
             for i in self.cell:
                 if (i//self.size==main[0] or i%self.size==main[1]):
                     self.cell[i]["guess"]=self.cell[i]["guess"].replace(str(self.MAIN_CELL[main]),"")
+                    self.Change=True
 
     ## conform the number if there are only one guess in the row and column
     def update_single_guess(self):
@@ -72,6 +76,7 @@ class Snail:
                             self.fill_cell[i]=self.cell[j*self.size+i]['main']
                             self.fill_list[0,j]+=1
                             self.fill_list[1,i]+=1
+                            self.Change=True
                             break
             self.update_fill()
  
@@ -90,6 +95,7 @@ class Snail:
                             self.fill_cell[j+i*self.size]=self.cell[j+i*self.size]['main']
                             self.fill_list[0,i]+=1
                             self.fill_list[1,j]+=1
+                            self.Change=True
                             break
             self.update_fill()
 
@@ -101,18 +107,24 @@ class Snail:
         for i in range(len(emy[0])):
             if emy[0,i]==3:    
                 for j in range(self.size):
-                    self.cell[i*5+j]["fill"]=True
+                    if self.cell[i*5+j]["fill"]==False:
+                        self.Change=True
+                        self.cell[i*5+j]["fill"]=True
+                
         for i in range(len(emy[1])):
             if emy[1,i]==3:
                 for j in range(self.size):
-                    self.cell[j*5+i]["fill"]=True
+                    if self.cell[j*5+i]["fill"]==False:
+                        self.cell[j*5+i]["fill"]=True
+                        self.Change=True
 
     ## update the guesses if any new value is added
     def update_fill(self):
         for j in self.fill_cell:
             for i in self.cell:
-                    if (i//self.size==j//self.size or i%self.size==j%self.size):
-                        self.cell[i]["guess"]=self.cell[i]["guess"].replace(str(self.fill_cell[j]),"")       
+                    if ((i//self.size==j//self.size or i%self.size==j%self.size) ) and self.cell[i]["guess"]!=self.cell[i]["guess"].replace(str(self.fill_cell[j]),"") :
+                        self.cell[i]["guess"]=self.cell[i]["guess"].replace(str(self.fill_cell[j]),"")
+                        self.Change=True       
     
     ## update the value and guesses in the path consideration 
     def update_path(self):
@@ -136,11 +148,13 @@ class Snail:
                     self.cell[pos-1]["guess"]="null"
                     self.empty_list[0,(pos-1)//self.size]-=1
                     self.empty_list[1,(pos-1)%self.size]-=1
+                    self.Change=True
                 else:                  
                     list_remove=['1','2','3']
                     list_remove.remove(str(order))
                     for k in list_remove:
                         self.cell[pos-1]["guess"]=self.cell[pos-1]["guess"].replace(k,'')
+                    self.Change=True
     
     ## update the value and guesses in the path consideration but in the reverse direction
     def update_rev_path(self):
@@ -164,11 +178,13 @@ class Snail:
                     self.cell[pos-1]["guess"]="null"
                     self.empty_list[0,(pos-1)//self.size]-=1
                     self.empty_list[1,(pos-1)%self.size]-=1
+                    self.Change=True
                 else:
                     list_remove=['1','2','3']
                     list_remove.remove(str(order))
                     for k in list_remove:
                         self.cell[pos-1]["guess"]=self.cell[pos-1]["guess"].replace(k,'')
+                    self.Change=True
 
     ## if the updated guesses have no value it will update with 0
     def update_guesses(self):
@@ -178,6 +194,7 @@ class Snail:
                 self.cell[i]["main"]=0
                 self.empty_list[0,i//self.size]-=1
                 self.empty_list[1,i%self.size]-=1
+                self.Change=True
             #pdb.set_trace()
             if self.cell[i]["fill"]==True and len(self.cell[i]["guess"].replace('-',''))==1:
                 self.cell[i]['main']=int(self.cell[i]["guess"].replace('-',''))
@@ -187,6 +204,7 @@ class Snail:
                 self.fill_cell[i]=self.cell[i]['main']
                 self.fill_list[0,i//self.size]+=1
                 self.fill_list[1,i%self.size]+=1
+                self.Change=True
 
     ## print the matrix for underastanding 
     def p(self,guess=False):
@@ -202,21 +220,21 @@ class Snail:
 
 #TODO: make the '0' as 'x' in game print
 #TODO: add comments
-#TODO: Make a update boolean and do a while condition
 
 
-#game=Snail(5,{(0,1):1,(2,2):3,(2,4):2,(4,1):2,(4,3):3}) # 1
-#sgame=Snail(5,{(2,0):1,(3,2):2,(4,2):3}) # 2
+
+game=Snail(5,{(0,1):1,(2,2):3,(2,4):2,(4,1):2,(4,3):3}) # 1
+#game=Snail(5,{(2,0):1,(3,2):2,(4,2):3}) # 2
 #game=Snail(5,{(0,2):1,(1,1):2,(4,3):3}) # 3 not solved add new function for 2 cells ahead guess update 
-game=Snail(5,{(3,0):1,(2,2):3}) # 4
+#game=Snail(5,{(3,0):1,(2,2):3}) # 4 not solved
 
-#game=Snail(5,{(3,0):1,(2,2):3})
-
-#game=Snail(5,{(0,1):1,(1,4):2})
-
+#game=Snail(5,{(0,1):1,(1,4):2}) # error
+n=0
 game.update_main()
-for i in range(5):
-    #pdb.set_trace()
+while(game.Change and n<5):
+    n+=1
+    #import pdb;pdb.set_trace()
+    game.Change=False
     game.update_path()
     game.update_rev_path()
     game.update_fill_para()
@@ -227,4 +245,4 @@ for i in range(5):
     game.update_guesses()
     game.p(True)
     
-    print()
+    print("")
