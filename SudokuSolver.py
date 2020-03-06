@@ -6,11 +6,26 @@ class Sudoku:
         for i in main:
             self.cell[i[0]-1,i[1]-1]=main[i]
     def p(self,guess=False):
-        print(self.cell),
+        print(self.cell)
     
     def solve(self,i,j):
+        if self.cell[i-1,j-1]!=0:
+            return 
         temp=[k for k in range(1,10)]
-        print(np.delete(self.cell[i-1,:],np.where(self.cell[i-1,:]==[0,5])),self.cell[:,j-1])
+        #import pdb;pdb.set_trace()
+        value_set=set(np.append(self.cell[i-1,:],self.cell[:,j-1]))
+        (m,n)=((i-1)//3,(j-1)//3)
+        for row in range(3):
+            for col in range(3):
+                value_set.add(self.cell[m*3+row,n*3+col])
+        if len(value_set)==9 and 0 in value_set:
+            self.cell[i-1,j-1]=list(set(range(1,10))-value_set)[0]
+            return 
+
+    def solver(self):
+        for i in range(1,10):
+            for j in range(1,10):
+                self.solve(i,j)
 
 main={(1,1):5,(1,2):3,(2,1):6,(3,2):9,(3,3):8,(1,5):7,(2,4):1,
 (2,5):9,(2,6):5,(3,8):6,(4,1):8,(5,1):4,(6,1):7,(5,4):8,(4,5):6,
@@ -20,5 +35,10 @@ main={(1,1):5,(1,2):3,(2,1):6,(3,2):9,(3,3):8,(1,5):7,(2,4):1,
 
 game=Sudoku(main,9)
 game.p()
-game.solve(1,9)
+for _ in range(5):
+    #import pdb;pdb.set_trace()
+
+    game.solver()
+    game.p()
+    print('-'*30)
 

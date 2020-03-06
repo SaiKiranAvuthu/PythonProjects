@@ -223,11 +223,11 @@ class Snail:
 
 
 
-game=Snail(5,{(0,1):1,(2,2):3,(2,4):2,(4,1):2,(4,3):3}) # 1
+#game=Snail(5,{(0,1):1,(2,2):3,(2,4):2,(4,1):2,(4,3):3}) # 1
 #game=Snail(5,{(2,0):1,(3,2):2,(4,2):3}) # 2
 #game=Snail(5,{(0,2):1,(1,1):2,(4,3):3}) # 3 not solved add new function for 2 cells ahead guess update 
 #game=Snail(5,{(3,0):1,(2,2):3}) # 4 not solved
-
+game=Snail(5,{(3,2):2,(4,4):2}) # 5
 #game=Snail(5,{(0,1):1,(1,4):2}) # error
 n=0
 game.update_main()
